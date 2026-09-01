@@ -4,63 +4,67 @@
 
 Public, release-safe components for fine-tuning models for under-resourced Louisiana languages, beginning with Cajun French and Kouri-Vini.
 
-## Status:
+## Status
 
-MVP 0.1 Status Report: ⧉ https://claude.ai/code/artifact/2cab4935-782e-4d7c-aa78-bb4b7d376e31
+**[MVP 0.1 Status Report](https://claude.ai/code/artifact/2cab4935-782e-4d7c-aa78-bb4b7d376e31)**
 
-Same content as before — 9/9 tickets closed, 127 tests passing, mypy strict clean across 9 modules. §2 (data contract), §3's preprocess slice, §5 (hyperparameter config), and §7's consent ledger are complete for their current scope; §3's bake-off, §6's eval, §7's remaining 3 artifacts, §8's selection algorithm, and §10's tracking backend are real-but-partial seams waiting on infra (GPU, gold set, chosen algorithm, chosen backend) rather than more scaffolding. §9 (speech lane) is out of 0.1 scope by design.
+9/9 tickets closed, 127 tests passing, mypy strict clean across 9 modules. The data contract,
+the preprocess ingestion slice, the hyperparameter config loader, and the consent ledger are
+complete for their current scope; the bake-off orchestration, the eval harness, the remaining
+governance artifacts, the coreset selection algorithm, and the run-tracking backend are
+real-but-partial seams waiting on infrastructure (GPU, gold set, a chosen algorithm, a chosen
+tracking backend) rather than more scaffolding. The speech lane is out of 0.1 scope by design.
 
-## Code Base Analysis:
+## Code base analysis
 
-Codebase metrics — fine-tune-creole-models-dev
+Metrics below are measured on the private development repo (`fine-tune-creole-models-dev`),
+which builds and tests every module before its release-safe subset is synced here.
 
-Size
+**Size**
 
-┌────────────────────────────────┬───────┬───────┐
-│            Category            │  LOC  │ Files │
-├────────────────────────────────┼───────┼───────┤
-│ src/ (8 modules)               │ 1,038 │ 8     │
-├────────────────────────────────┼───────┼───────┤
-│ utils/ (preprocess CLI + core) │ 271   │ 2     │
-├────────────────────────────────┼───────┼───────┤
-│ tests/ (9 suites)              │ 1,587 │ 9     │
-├────────────────────────────────┼───────┼───────┤
-│ Total                          │ 2,896 │ 19    │
-└────────────────────────────────┴───────┴───────┘
+| Category | LOC | Files |
+|---|---:|---:|
+| `src/` (8 modules) | 1,038 | 8 |
+| `utils/` (preprocess CLI + core) | 271 | 2 |
+| `tests/` (9 suites) | 1,587 | 9 |
+| **Total** | **2,896** | **19** |
 
-Test:code ratio ≈ 1.21 — more test code than production code, consistent with the strict TDD discipline used throughout.
+Test:code ratio ≈ 1.21 — more test code than production code, consistent with the strict TDD
+discipline used throughout.
 
-Coverage (pytest-cov, line coverage)
+**Coverage** (`pytest-cov`, line coverage)
 
-┌─────────────────────────────────────────────────────────┬───────┬───────────────────────────────────────────────────────────────────────────┐
-│                         Module                          │ Stmts │                                   Cover                                   │
-├─────────────────────────────────────────────────────────┼───────┼───────────────────────────────────────────────────────────────────────────┤
-│ data_contract, coreset, eval, governance, lid, tracking │ 313   │ 100%                                                                      │
-├─────────────────────────────────────────────────────────┼───────┼───────────────────────────────────────────────────────────────────────────┤
-│ bakeoff                                                 │ 60    │ 97% (2 defensive branches: malformed candidate id, non-mapping YAML root) │
-├─────────────────────────────────────────────────────────┼───────┼───────────────────────────────────────────────────────────────────────────┤
-│ train                                                   │ 63    │ 94% (steps<2 guard, sweep's append-fallback branch)                       │
-├─────────────────────────────────────────────────────────┼───────┼───────────────────────────────────────────────────────────────────────────┤
-│ utils/fine_tune_cajun_preprocess.py (core)              │ 86    │ 93%                                                                       │
-├─────────────────────────────────────────────────────────┼───────┼───────────────────────────────────────────────────────────────────────────┤
-│ utils/fine-tune-cajun-preprocess.py (CLI wrapper)       │ 27    │ 0% — argparse-only, deliberately outside pytest's import graph            │
-├─────────────────────────────────────────────────────────┼───────┼───────────────────────────────────────────────────────────────────────────┤
-│ Weighted total                                          │ 499   │ 92%                                                                       │
-└─────────────────────────────────────────────────────────┴───────┴───────────────────────────────────────────────────────────────────────────┘
+| Module | Stmts | Cover | Notes |
+|---|---:|---:|---|
+| `data_contract`, `coreset`, `eval`, `governance`, `lid`, `tracking` | 313 | 100% | |
+| `bakeoff` | 60 | 97% | 2 defensive branches: malformed candidate id, non-mapping YAML root |
+| `train` | 63 | 94% | `steps < 2` guard, sweep's append-fallback branch |
+| `utils/fine_tune_cajun_preprocess.py` (core) | 86 | 93% | |
+| `utils/fine-tune-cajun-preprocess.py` (CLI wrapper) | 27 | 0% | argparse-only, deliberately outside pytest's import graph |
+| **Weighted total** | **499** | **92%** | |
 
-Type safety: mypy strict = true passes clean across all 9 source files. Zero type: ignore in src/; 13 in utils/, all at the one documented JSON→dataclass boundary — a bounded, legitimate use, not scattered suppression.
+**Type safety**: mypy `strict = true` passes clean across all 9 source files. Zero
+`type: ignore` in `src/`; 13 in `utils/`, all at the one documented JSON→dataclass boundary — a
+bounded, legitimate use, not scattered suppression.
 
-Complexity proxy: 23 classes / 22 functions across 1,038 src/ lines (~45 LOC/def) — small, single-purpose units. No file exceeds 180 lines.
+**Complexity proxy**: 23 classes / 22 functions across 1,038 `src/` lines (~45 LOC/def) — small,
+single-purpose units. No file exceeds 180 lines.
 
-Comment density: uneven — data_contract.py (35 comment-lines/180, 19%) and lid (7%) carry real rationale comments explaining non-obvious decisions; coreset, eval, governance, tracking, train have zero inline comments, relying entirely on docstrings instead (a stylistic drift, not a defect — each module's docstring is substantial).
+**Comment density**: uneven — `data_contract.py` (35 comment-lines/180, 19%) and `lid` (7%) carry
+real rationale comments explaining non-obvious decisions; `coreset`, `eval`, `governance`,
+`tracking`, `train` have zero inline comments, relying entirely on docstrings instead (a
+stylistic drift, not a defect — each module's docstring is substantial).
 
-Dependencies: minimal — one runtime dependency (pyyaml), four dev-only (mypy, pytest, pytest-cov, types-pyyaml).
+**Dependencies**: minimal — one runtime dependency (`pyyaml`), four dev-only (`mypy`, `pytest`,
+`pytest-cov`, `types-pyyaml`).
 
-Git history: 17 commits, single-day history (repo created 2026-08-31) — matches the fresh, spec-driven build-out documented in the status report.
+**Git history**: 17 commits, single-day history (dev repo created 2026-08-31) — matches the
+fresh, spec-driven build-out documented in the status report above.
 
-Takeaway: high-rigor, low-volume codebase — everything built is fully typed, heavily tested (92% line coverage, 100% on 6 of 8 modules), and zero-suppression on typing. The uncovered 8% is concentrated in defensive/edge branches and one deliberately-untested CLI wrapper, not core logic gaps.
-
-
+**Takeaway**: high-rigor, low-volume codebase — everything built is fully typed, heavily tested
+(92% line coverage, 100% on 6 of 8 modules), and zero-suppression on typing. The uncovered 8% is
+concentrated in defensive/edge branches and one deliberately-untested CLI wrapper, not core logic
+gaps.
 
 ## Current scope
 
