@@ -1,5 +1,7 @@
 # fine-tune-creole-models
 
+*STATUS: (as of Sep 1, 2026) - non-functional, in spec-driven development for MVP 0.1 release*
+
 Public, release-safe components for fine-tuning models for under-resourced Louisiana languages, beginning with Cajun French and Kouri-Vini.
 
 ## Current scope
