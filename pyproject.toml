@@ -5,12 +5,15 @@ description = "Fine-tuning pipeline for under-resourced Louisiana languages (Caj
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "pyyaml>=6.0.3",
+]
 
 [dependency-groups]
 dev = [
     "mypy>=1.11",
     "pytest>=8.3",
+    "types-pyyaml",
 ]
 
 [tool.pytest.ini_options]
@@ -27,7 +30,16 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-only-include = ["src/data_contract.py"]
+only-include = [
+    "src/data_contract.py",
+    "src/lid",
+    "src/bakeoff",
+    "src/eval",
+    "src/train",
+    "src/coreset",
+    "src/governance",
+    "src/tracking",
+]
 sources = ["src"]
 
 [tool.hatch.build.targets.sdist]
@@ -37,6 +49,21 @@ include = [
     "/README.md",
     "/pyproject.toml",
     "/src/data_contract.py",
+    "/src/lid",
+    "/src/bakeoff",
+    "/src/eval",
+    "/src/train",
+    "/src/coreset",
+    "/src/governance",
+    "/src/tracking",
     "/tests/test_data_contract.py",
+    "/tests/test_lid.py",
+    "/tests/test_bakeoff.py",
+    "/tests/test_eval.py",
+    "/tests/test_train.py",
+    "/tests/test_coreset.py",
+    "/tests/test_governance.py",
+    "/tests/test_tracking.py",
+    "/configs",
     "/uv.lock",
 ]

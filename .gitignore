@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# fine-tune-creole-models pipeline data & reports: raw/normalized/gold/
+# silver/synthetic corpus data and generated run reports never belong in git
+/data/
+/reports/

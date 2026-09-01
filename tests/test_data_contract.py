@@ -19,6 +19,7 @@ def make_item(**overrides: object) -> DataItem:
         source="test-collection",
         language_tag="frc",
         lect=None,
+        genre=None,
         orthography_system="ad_hoc",
         consent_tier="training",
         rights="cc_open",
@@ -114,7 +115,7 @@ def test_ineligible_when_training_permission_no() -> None:
 
 
 def test_ineligible_when_training_permission_uncertain() -> None:
-    """Uncertain training permission is fail-safe-treated as no."""
+    """uncertain is fail-safe-treated as no, per the linguist-handoff source."""
     result = is_eligible(make_item(training_permission="uncertain"))
     assert result.eligible is False
     assert result.reasons == ("training_permission_not_granted",)
@@ -148,7 +149,8 @@ def test_ineligible_reports_multiple_failing_conditions() -> None:
 
 
 def test_community_review_with_signoff_is_accepted() -> None:
-    """Signed-off community review must not be rejected as restricted."""
+    """community_review-with-signoff (tech-spec §2's exact eligible
+    condition) must not be over-strictly rejected alongside restricted/sacred."""
     result = is_eligible(
         make_item(cultural_sensitivity="community_review", community_review_signed_off=True)
     )
@@ -157,7 +159,10 @@ def test_community_review_with_signoff_is_accepted() -> None:
 
 
 def test_community_review_without_signoff_is_rejected() -> None:
-    """Bare community review must not silently pass as if it were open."""
+    """The tech-spec's eligible condition is community_review-WITH-SIGNOFF
+    specifically — bare community_review, not yet signed off, must not
+    silently pass as if it were `open` (stories 4/5: consent tier must
+    never be silently upgraded)."""
     result = is_eligible(
         make_item(cultural_sensitivity="community_review", community_review_signed_off=False)
     )

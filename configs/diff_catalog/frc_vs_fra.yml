@@ -1,0 +1,81 @@
+# configs/diff_catalog/frc_vs_fra.yml
+#
+# ENGINEERING-DRAFTED, LINGUIST-UNREVIEWED SEED — see lou_vs_fra.yml's header
+# note for the same caveat. Transcribed from the ARD §4 Cajun/Louisiana
+# French divergence table; makes no new linguistic claims beyond what that
+# table states.
+#
+# Cajun/Louisiana French retains French inflection and grammatical gender
+# (ARD §4): its risk profile differs from Kouri-Vini's — it is structurally
+# closer to French, so this catalog's priority is capturing specific
+# vernacular divergence points, not a from-scratch grammar contrast. No
+# anti-conflation axis file exists for frc (unlike lou_vs_hat.yml) — the ARD
+# does not name an equivalent conflation risk for Cajun French against any
+# third language.
+meta:
+  target_lang: frc
+  contrast_lang: fra
+  version: 0.1.0-draft
+  schema_version: "1.0.0"
+  status: draft-unreviewed
+  drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4 (source: linguistics-deep-dive.md, kouri-vini-louisiana-french-survey.md)"
+cells:
+  - id: ASP-001
+    axis: morphosyntax
+    feature: "periphrastic progressive aspect"
+    frc_form: "a periphrastic \"to be after + infinitive\" construction"
+    fra_contrast: "être en train de"
+    failure_mode: "model \"corrects\" to Standard French's periphrasis, or misreads the vernacular construction"
+    priority: high
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: FUT-001
+    axis: morphosyntax
+    feature: "future register/frequency distribution"
+    frc_form: "aller + infinitive, shared with French but different register/frequency distribution"
+    fra_contrast: "futur simple more common in formal French"
+    failure_mode: "register-flattening loses the vernacular signal"
+    priority: medium
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: PRO-002
+    axis: lexicogrammar
+    feature: "1st-person-plural pronoun"
+    frc_form: "on has largely replaced nous, reinforced by an emphatic \"nous-autres\" form"
+    fra_contrast: "nous"
+    failure_mode: "systematic pronoun-frequency mismatch vs. Standard French training data"
+    priority: critical
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: VERB-001
+    axis: morphosyntax
+    feature: "3rd-person-plural verb endings"
+    frc_form: "dialectal endings distinct from Standard French's -aient"
+    fra_contrast: "standard -aient"
+    failure_mode: "silently regularized to Standard French conjugation"
+    priority: high
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: PRO-003
+    axis: lexicogrammar
+    feature: "2nd-person-plural"
+    frc_form: "an emphatic \"vous-autres\" form"
+    fra_contrast: "vous"
+    failure_mode: "register/dialect marker lost"
+    priority: medium
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: LOAN-001
+    axis: lexicogrammar
+    feature: "bare English loanverbs"
+    frc_form: "English verbs used uninflected under a periphrastic construction"
+    fra_contrast: "N/A"
+    failure_mode: "model imposes French inflection onto code-switched English verbs"
+    priority: high
+    source: "linguistics-deep-dive.md, kouri-vini-louisiana-french-survey.md"
+    coverage_status: unmet

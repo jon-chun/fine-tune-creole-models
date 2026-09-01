@@ -1,0 +1,42 @@
+# configs/models/bakeoff_candidates.yml
+#
+# Base-model bake-off candidate shortlist, per language (tech-spec §3.2, ARD
+# §6). Committed verbatim from the tech-spec's already-verified content
+# (verified 2026-08-31) — unlike the diff-catalog files, this is not a
+# linguist-owned research question; it is a fully decided, dated
+# configuration. Re-verify hf_repo/license before actually training, per the
+# tech-spec's own note, in case a listing or license changes between now and
+# a real bake-off run.
+frc:
+  candidates:
+    - id: claire-7b-apache
+      hf_repo: "OpenLLM-France/Claire-7B-Apache-0.1"
+      license: apache-2.0
+      note: >
+        Verified 2026-08-31. Mistral-7B-v0.1-derived, trained on diarized French conversation
+        (parliamentary proceedings, theater scripts, interviews) — speech-genre-adjacent per
+        ARD §6. CAUTION: sibling repos Claire-7B-0.1 and Claire-Mistral-7B-0.1 exist under
+        CC-BY-NC-SA 4.0 (non-commercial) — pin this exact repo id, never "Claire" generically,
+        or an engineer could silently pull the non-commercial variant. No recent-activity signal
+        found beyond its Nov 2023 publication; confirm still hosted before committing.
+    - id: croissantllm-chat
+      hf_repo: "croissantllm/CroissantLLMChat-v0.1"
+      license: mit
+      note: >
+        Verified 2026-08-31. Base variant: croissantllm/CroissantLLMBase. 1.3B params, bilingual
+        FR-EN, built for code-switching per ARD §6 — smaller model class as ARD's caveat flags.
+        Last activity signal ~Oct 2024.
+    - id: mistral-7b-v0.3
+      hf_repo: "mistralai/Mistral-7B-v0.3"
+      license: apache-2.0
+    - id: control-low-transfer
+      base: null
+lou:
+  candidates:
+    - id: mistral-7b-v0.3
+      hf_repo: "mistralai/Mistral-7B-v0.3"
+      license: apache-2.0
+    - id: control-low-transfer
+      base: null
+  # No hat-transfer candidate: no open-weight generative Haitian-Creole-adapted LLM exists
+  # (verified 2026-08-31 — see tech-spec §3.2). 2-candidate bake-off, not a placeholder gap.

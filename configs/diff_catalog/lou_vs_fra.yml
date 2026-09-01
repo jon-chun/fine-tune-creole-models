@@ -1,0 +1,100 @@
+# configs/diff_catalog/lou_vs_fra.yml
+#
+# ENGINEERING-DRAFTED, LINGUIST-UNREVIEWED SEED — not a finished, authoritative
+# catalog. Per tech-spec §4: "the linguist role owns and edits cell content;
+# this tech-spec specifies the machine-consumable format." This file was
+# drafted by transcribing the ARD §4 divergence table
+# (dev/ARD_fine-tune-cajun_v1_20260831.md) into the tech-spec's YAML schema —
+# it makes no new linguistic claims beyond what that table already states,
+# and every cell's `lou_form`/`fra_contrast` text is close to verbatim from
+# the ARD, not independently researched or verified. A linguist reviewing
+# this file should treat every cell as a starting draft: verify accuracy,
+# add attestation, adjust `priority`, and add the many additional cells the
+# ARD's table only summarizes (it names 7 axes as "highest-value," not an
+# exhaustive catalog).
+meta:
+  target_lang: lou
+  contrast_lang: fra
+  version: 0.1.0-draft
+  schema_version: "1.0.0"
+  status: draft-unreviewed
+  drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4 (source: linguistics-deep-dive.md)"
+cells:
+  - id: TMA-001
+    axis: morphosyntax
+    feature: "invariant verb stem + preverbal TMA particles"
+    lou_form: "invariant verb stem; tense/mood/aspect carried by preverbal particles (past, progressive, future, conditional markers)"
+    fra_contrast: "full inflectional conjugation"
+    failure_mode: "French-biased model regularizes Kouri-Vini verb into French conjugation"
+    priority: critical
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: COP-001
+    axis: morphosyntax
+    feature: "zero copula / obligatory equational copula for NP=NP"
+    lou_form: "zero copula with adjectival/locative predicates; obligatory copula for noun-phrase-equals-noun-phrase constructions"
+    fra_contrast: "obligatory être, full paradigm"
+    failure_mode: "model inserts or removes a copula per French rules, breaking valid zero-copula constructions"
+    priority: critical
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: NEG-001
+    axis: morphosyntax
+    feature: "single negation clitic"
+    lou_form: "single negation clitic; placement varies by regional lect"
+    fra_contrast: "discontinuous (ne)…pas"
+    failure_mode: "model \"completes\" negation with French's two-part construction"
+    priority: high
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: DET-001
+    axis: morphosyntax
+    feature: "postposed determiners"
+    lou_form: "postposed definite/plural markers"
+    fra_contrast: "preposed le/la/les"
+    failure_mode: "model reorders determiners to French's preposed pattern"
+    priority: high
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: PRO-001
+    axis: morphosyntax
+    feature: "tonic pronoun forms in subject position"
+    lou_form: "tonic pronoun forms used in subject position; little clitic/tonic distinction"
+    fra_contrast: "clitic subject pronouns (je, tu, il)"
+    failure_mode: "model substitutes French clitic pronoun forms"
+    priority: high
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: ADJ-001
+    axis: morphosyntax
+    feature: "adjective order"
+    lou_form: "mostly postnominal"
+    fra_contrast: "mostly prenominal"
+    failure_mode: "model reorders adjectives to French placement"
+    priority: medium
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+
+  - id: ORTH-001
+    axis: orthography
+    feature: "phonemic KVO orthography (nasal vowels, digraphs)"
+    lou_form: "phonemic 2016 KVO standard; nasal vowels and digraphs with dedicated graphemes"
+    fra_contrast: "French orthography (silent letters, different diacritic conventions)"
+    failure_mode: "diacritic-stripping/ASCII-folding tokenizers silently corrupt the phoneme inventory"
+    priority: critical
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+    note: >
+      A single seed cell standing in for the "ORTH-001..010" range the
+      tech-spec §4 example anticipates (see its cells comment: "ORTH-001..010
+      (KVO grapheme/nasal-vowel cells) — see ARD §4 table for the full
+      initial seed list; the linguist role owns additions/edits"). The ARD's
+      table does not itemize each individual grapheme/nasal-vowel pair, so
+      this draft cannot split them further without inventing content beyond
+      what the source states — a linguist should expand this into the full
+      per-grapheme cell set.

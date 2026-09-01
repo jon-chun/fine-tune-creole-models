@@ -11,8 +11,12 @@ Pure and side-effect-free: no file, network, or database access. Callers
 (the preprocess utility, the coreset selector, etc.) own all I/O and are
 responsible for routing ineligible items to an inventory-only sink.
 
-Rights and training permission remain separate, first-class fields. They are
-recorded explicitly on every item and are never inferred from one another.
+Schema field sourcing: dev/tech-spec_fine-tune-cajun_v1_20260831.md §2, plus
+the `rights`/`training_permission` reconciliation against the binding
+linguist-handoff source described in GitHub issue #1's Implementation
+Decisions (the tech-spec's own §2 schema block under-specifies `rights` and
+omits `training_permission` as a field; that source's v2 correction
+promotes `training_permission` to first-class, never derived on the fly).
 """
 
 from __future__ import annotations
@@ -20,30 +24,38 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, get_args
 
-# Closed language-ID taxonomy. An item's variety must never be collapsed or
-# guessed beyond these seven tags.
+# language_tag: the closed LID taxonomy. CONTEXT.md "Language-ID taxonomy";
+# tech-spec §2. No value outside this set is valid — an item's variety must
+# never be collapsed or guessed beyond these seven tags.
 LanguageTag = Literal["lou", "frc", "fra", "hat", "eng", "mixed", "unknown"]
 
-# `ad_hoc` is the deliberate fallback for frc items pending a ratified
-# orthography convention — a valid non-error state, not a rejection.
+# orthography_system: tech-spec §2. `ad_hoc` is the deliberate, code-enforced
+# fallback for frc items pending a ratified orthography convention (ARD §12)
+# — a valid non-error state, not a rejection.
 OrthographySystem = Literal["KVO", "French-like", "ad_hoc", "English-phonetic", "mixed"]
 
-# Consent travels with the item from ingestion through training; a pipeline
-# stage must never use data above the tier it was granted.
+# consent_tier: tech-spec §2; CONTEXT.md "Consent tier". Travels with the
+# item from ingestion through training; a pipeline stage must never use data
+# above the tier it was granted.
 ConsentTier = Literal["display", "research", "model-eval", "training", "commercial-prohibited", "withdrawal"]
 
-# Rights are a closed enum rather than a free-text license identifier.
+# rights: the linguist-handoff data-contract source's closed enum (not the
+# tech-spec's looser "license id" free text) — see module docstring.
 Rights = Literal["public_domain", "cc_open", "cc_restricted", "archive_permission", "rights_unknown", "all_rights_reserved"]
 
-# Training permission is recorded explicitly, never derived from other fields.
-# `uncertain` is treated as `no` by is_eligible (fail-safe).
+# training_permission: first-class per the linguist-handoff source's v2
+# correction — recorded explicitly on every item, never derived from other
+# fields. `uncertain` is treated as `no` by is_eligible (fail-safe).
 TrainingPermission = Literal["yes_general", "yes_scoped", "no", "uncertain"]
 
-# `restricted` and `sacred` items must never reach an eligible verdict.
-# `community_review-with-signoff` is represented by the enum plus the explicit
-# `community_review_signed_off` field below.
+# cultural_sensitivity: tech-spec §2. `restricted`/`sacred` items must never
+# reach an eligible verdict via a coding mistake elsewhere in the pipeline.
+# tech-spec §2's eligibility condition is specifically
+# `community_review-with-signoff`, a sub-state of `community_review` — see
+# `community_review_signed_off` below, which the enum alone can't represent.
 CulturalSensitivity = Literal["open", "community_review", "restricted", "sacred"]
 
+# release_class: tech-spec §2.
 ReleaseClass = Literal["public", "gated", "do_not_use"]
 
 _LANGUAGE_TAGS = frozenset(get_args(LanguageTag))
@@ -66,20 +78,26 @@ class DataContractError(ValueError):
 
 @dataclass(frozen=True, slots=True)
 class DataItem:
-    """The minimum per-item record every ingested asset must carry."""
+    """The minimum per-item record every ingested asset must carry (tech-spec §2)."""
 
     item_id: str
     source: str
     language_tag: LanguageTag
     lect: str | None
+    # genre: free text, optional — same shape as lect. Named only in
+    # tech-spec §8's coreset stratification prose ("language_tag/lect/
+    # genre"), not in §2's own schema block; no source names a closed genre
+    # taxonomy, so this follows lect's precedent rather than inventing one.
+    genre: str | None
     orthography_system: OrthographySystem
     consent_tier: ConsentTier
     rights: Rights
     training_permission: TrainingPermission
     cultural_sensitivity: CulturalSensitivity
-    # Meaningful only when cultural_sensitivity == "community_review".
-    # Ignored for open/restricted/sacred, where it carries no eligibility
-    # meaning either way.
+    # Meaningful only when cultural_sensitivity == "community_review"; the
+    # tech-spec §2 eligibility condition is "community_review-with-signoff"
+    # specifically, not bare community_review. Ignored for open/restricted/
+    # sacred, where it carries no eligibility meaning either way.
     community_review_signed_off: bool
     release_class: ReleaseClass
     synthetic: bool
@@ -88,8 +106,8 @@ class DataItem:
     schema_version: str
 
     def __post_init__(self) -> None:
-        # Hard-required, non-nullable fields are rejected at ingest and never
-        # silently defaulted.
+        # Hard-required, non-nullable fields (tech-spec §2 explicit invariant):
+        # rejected at ingest, never silently defaulted.
         if not self.item_id:
             raise DataContractError("item_id is required and must be non-empty")
         if not self.language_tag:
@@ -105,7 +123,9 @@ class DataItem:
         _require_member(self.cultural_sensitivity, _CULTURAL_SENSITIVITIES, "cultural_sensitivity")
         _require_member(self.release_class, _RELEASE_CLASSES, "release_class")
 
-        # Synthetic items must be traceable to their generator.
+        # synthetic=true items must be traceable to their generator (tech-spec
+        # §6.4 gold/silver/synthetic discipline; CONTEXT.md "Gold / silver /
+        # synthetic").
         if self.synthetic and not self.generator:
             raise DataContractError("generator is required when synthetic=True")
 
@@ -134,9 +154,11 @@ class EligibilityResult:
 def is_eligible(item: DataItem) -> EligibilityResult:
     """Decide whether `item` may proceed past ingestion into annotation or training selection.
 
-    Pure function: no I/O, no side effects, deterministic. Ineligible items are
-    not this function's concern to route anywhere; that remains the caller's
-    responsibility.
+    Pure function: no I/O, no side effects, deterministic. Reflects
+    tech-spec §2's eligibility pre-filter, reconciled against the binding
+    linguist-handoff source's rights/training_permission enums (see module
+    docstring). Ineligible items are not this function's concern to route
+    anywhere — that's the caller's job (tech-spec's inventory-only sink).
     """
     reasons: list[EligibilityReason] = []
 

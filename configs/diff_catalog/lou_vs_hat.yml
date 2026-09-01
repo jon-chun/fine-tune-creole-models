@@ -1,0 +1,44 @@
+# configs/diff_catalog/lou_vs_hat.yml — anti-conflation axis
+#
+# ENGINEERING-DRAFTED, LINGUIST-UNREVIEWED SEED — see lou_vs_fra.yml's header
+# note for the same caveat, repeated here: this transcribes ARD §4's single
+# worked anti-conflation example (the tech-spec §4 example block itself)
+# rather than independently researching the full lou/hat contrast. A
+# linguist should treat ANTI-HAT-001 as one illustrative seed cell, not a
+# complete anti-Haitian-Creole-conflation catalog — ARD §4 explicitly says
+# "several surface features are structurally convergent with Haitian Creole"
+# (plural), implying more cells belong here than this draft provides.
+meta:
+  target_lang: lou
+  contrast_lang: hat
+  version: 0.1.0-draft
+  schema_version: "1.0.0"
+  status: draft-unreviewed
+  drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4; dev/tech-spec_fine-tune-cajun_v1_20260831.md §4 worked example"
+  purpose: >
+    Anti-conflation check for Kouri-Vini (lou): several surface features are
+    structurally convergent with Haitian Creole without being historically
+    derived from it (parallel restructuring of French, not genetic descent).
+    A model trained partly on Haitian Creole data can produce
+    plausible-but-wrong "Haitianisms." This catalog directs the conflation
+    red-team suite (tech-spec §6.3) at exactly the cells below.
+cells:
+  - id: ANTI-HAT-001
+    axis: cross-linguistic-conflation
+    feature: "preverbal TMA particles and postposed determiners/plural markers"
+    shared_surface_form: "several TMA particles, postposed determiners/plural markers"
+    why_convergent_not_derived: "parallel restructuring of French, not genetic descent — lou attestation predates the era of major Haitian immigration to Louisiana"
+    failure_mode: "model trained partly on hat data hallucinates plausible-but-wrong Haitianisms"
+    priority: critical
+    source: "linguistics-deep-dive.md"
+    coverage_status: unmet
+    note: >
+      This is the single worked example already given in tech-spec §4's
+      catalog-format illustration, promoted here to a real seed cell rather
+      than re-invented. The linguist role should add the additional
+      convergent-but-not-derived features ARD §4 gestures at (plural
+      "several surface features") — TMA/determiner convergence overlaps
+      with lou_vs_fra.yml's TMA-001/DET-001 cells, since the same lou forms
+      are simultaneously divergent from French and convergent-but-unrelated
+      to Haitian Creole; this file's job is to flag the conflation risk on
+      those shared forms, not to re-derive the lou/fra contrast itself.

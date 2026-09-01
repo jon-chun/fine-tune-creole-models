@@ -1,0 +1,23 @@
+# configs/training/lora_defaults.yml
+#
+# LoRA/QLoRA/DoRA hyperparameter starting points (tech-spec §5). Committed
+# verbatim from the tech-spec's already-decided table (verified 2026-08-31) —
+# a fully decided default set, not a linguist-owned research question.
+#
+# tech-spec §5 explicitly frames these as "starting points to validate
+# empirically per language via the bake-off (§3.2), not fixed configuration."
+# rank picks the midpoint of the tech-spec's documented 16-32 general-task
+# range as the single loadable default — the tech-spec gives a range, not a
+# tie-broken single number, and no other tie-breaker process is documented;
+# flagged here rather than silently picked (see CONTEXT.md Decisions).
+#
+# alpha is intentionally NOT listed here — src/train/ derives it from rank
+# using the documented 2x r scaling convention, so this file cannot drift out
+# of that relationship.
+rank: 24
+target_modules: all_linear  # VRAM-constrained fallback: attention_qv_only
+learning_rate: 1.0e-4
+epochs: 2  # top of the documented 1-2 range: an explicit ceiling, not a floor
+batch_size_strategy: largest_that_fits
+quantization_train: bf16  # 4-bit rejected by the loader: unstable during adapter merging (tech-spec §5)
+warmup_fraction: 0.05
