@@ -11,10 +11,10 @@
 meta:
   target_lang: lou
   contrast_lang: hat
-  version: 0.1.0-draft
-  schema_version: "1.0.0"
+  version: 2.0.0
+  schema_version: "2.0.0"
   status: draft-unreviewed
-  drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4; dev/tech-spec_fine-tune-cajun_v1_20260831.md §4 worked example"
+  drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4; dev/tech-spec_fine-tune-cajun_v1_20260831.md §4 worked example; ANTI-HAT-001's why_convergent_not_derived and gate_class/probe_task updated per dev/tech-spec_fine-tune-cajun_v2_fable51max_20260902.md §4"
   purpose: >
     Anti-conflation check for Kouri-Vini (lou): several surface features are
     structurally convergent with Haitian Creole without being historically
@@ -27,9 +27,16 @@ cells:
     axis: cross-linguistic-conflation
     feature: "preverbal TMA particles and postposed determiners/plural markers"
     shared_surface_form: "several TMA particles, postposed determiners/plural markers"
-    why_convergent_not_derived: "parallel restructuring of French, not genetic descent — lou attestation predates the era of major Haitian immigration to Louisiana"
+    # why_convergent_not_derived: the v1 historical claim (predates the era
+    # of major Haitian immigration to Louisiana) is removed per tech-spec v2
+    # §4: "why_convergent_not_derived becomes [LINGUIST TO STATE]" — pending
+    # real linguistic review rather than carrying forward an unattested
+    # claim (ADR 0002 placeholder convention).
+    why_convergent_not_derived: "[LINGUIST TO STATE]"
     failure_mode: "model trained partly on hat data hallucinates plausible-but-wrong Haitianisms"
     priority: critical
+    gate_class: 1
+    probe_task: [judge, translate_eng]
     source: "linguistics-deep-dive.md"
     coverage_status: unmet
     note: >

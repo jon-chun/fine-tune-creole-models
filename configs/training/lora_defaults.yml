@@ -1,23 +1,86 @@
 # configs/training/lora_defaults.yml
 #
-# LoRA/QLoRA/DoRA hyperparameter starting points (tech-spec §5). Committed
-# verbatim from the tech-spec's already-decided table (verified 2026-08-31) —
-# a fully decided default set, not a linguist-owned research question.
+# LoRA/QLoRA/DoRA hyperparameter starting points (tech-spec v2 §5). MIG-01d
+# (issue #28) updates every value below from the v1 hybrid-schema defaults to
+# the v2 table, ratified by ADR 0015.
 #
-# tech-spec §5 explicitly frames these as "starting points to validate
+# tech-spec v2 §5 explicitly frames these as "starting points to validate
 # empirically per language via the bake-off (§3.2), not fixed configuration."
-# rank picks the midpoint of the tech-spec's documented 16-32 general-task
-# range as the single loadable default — the tech-spec gives a range, not a
-# tie-broken single number, and no other tie-breaker process is documented;
-# flagged here rather than silently picked (see CONTEXT.md Decisions).
+# rank/alpha load the v2 table's actual default (r=16, alpha=32 — "Quebec
+# r=16/alpha=32 [V: 2510.22747]"), not a re-tie-broken midpoint of the
+# widened 8-64 range (see CONTEXT.md's superseded "`rank: 24` is the
+# documented tie-break" Decision entry).
 #
 # alpha is intentionally NOT listed here — src/train/ derives it from rank
 # using the documented 2x r scaling convention, so this file cannot drift out
 # of that relationship.
-rank: 24
+rank: 16
+method: lora  # ablations: dora, attention_only (tech-spec v2 §5)
 target_modules: all_linear  # VRAM-constrained fallback: attention_qv_only
-learning_rate: 1.0e-4
-epochs: 2  # top of the documented 1-2 range: an explicit ceiling, not a floor
-batch_size_strategy: largest_that_fits
-quantization_train: bf16  # 4-bit rejected by the loader: unstable during adapter merging (tech-spec §5)
+learning_rate: 1.5e-4  # tech-spec v2 §5's documented 1e-4 to 2e-4 band
+epochs: 2  # within the widened 1-3 range; early_stopping below is the real ceiling
+effective_batch_sequences: 24  # tech-spec v2 §5's documented 16-32 range; supersedes batch_size_strategy
+quantization_train: bf16  # nf4 accepted by the loader only for >=20B stretch arms — see assert_nf4_requires_stretch_arm
 warmup_fraction: 0.05
+replay_fraction: 0.15  # tech-spec v2 §5's documented 10-20% band (ablation range 0-30%)
+
+# seeds: tech-spec v2 §5 requires 3 seeds for primary arms (single-seed runs
+# are exploratory only). Arbitrary but fixed starting values, not tuned.
+seeds: [42, 43, 44]
+
+# early_stopping: tech-spec v2 §5 "early stopping on a dialect dev split
+# (patience 1 epoch on dev chrF++ / probe accuracy), never on the locked
+# gold". metric names the dev-split metric to watch; the loader carries it
+# through without interpreting it.
+early_stopping:
+  metric: dev_chrf_plus_plus
+  patience: 1
+
+# task_prefixes: tech-spec v2 §5's single-stage SFT regime (D-4) task list.
+# The loader carries these through without interpreting them.
+task_prefixes:
+  - "translate frc->eng"
+  - "translate frc->fra"
+  - "normalize"
+  - "contrast"
+  - "judge"
+
+# lr_sweep_steps: sweep_learning_rate()'s step count (tech-spec §5: "sweep
+# roughly ±1 order of magnitude"). Previously hardcoded in src/train/ with no
+# YAML home; value unchanged, just relocated here.
+lr_sweep_steps: 5
+
+# overrides: optional per-language hyperparameter deltas (tech-spec §5:
+# hyperparameters are validated "per language"). load_hyperparameters(path,
+# language=...) applies the matching block's keys on top of the fields
+# above. No language currently needs a deviation from the shared defaults,
+# so this is empty rather than guessed.
+#
+# Corpus-derived cost/memory controls (tech-spec §10 "Cost and memory
+# controls"; issue #20) — max_seq_len, batch_token_budget, max_train_tokens.
+# None of the three has a repo-wide default: each language MUST carry all
+# three in its own overrides.<language> block before load_hyperparameters(
+# path, language=...) will succeed (it raises TrainingConfigError naming
+# whichever key(s) are still missing after overrides are applied). Populate
+# them by running:
+#
+#   uv run python utils/fine-tune-cajun-corpus-stats.py \
+#     --manifest <preprocess manifest.jsonl> --out <stats.json> --epochs <N>
+#
+# and copying that run's suggested `max_seq_len` / `max_train_tokens` into
+# the language's block below. `batch_token_budget` is NOT produced by that
+# utility — it's memory-bound (max_seq_len x batch_token_budget must fit the
+# target GPU/unified-memory budget), so it must be found by probing on the
+# real training hardware, not estimated from corpus text alone (that probe
+# is deferred alongside the training driver itself — see backlog 0009).
+# tech-spec v2 §5 additionally names 1,024-2,048 tokens as max_seq_len's
+# expected band (annex §7); the loader warns when a resolved value falls
+# outside it, on top of this existing presence requirement.
+#
+# Example (do not uncomment with invented numbers — fill in from a real run):
+#   overrides:
+#     frc:
+#       max_seq_len: 512
+#       batch_token_budget: 8192
+#       max_train_tokens: 2000000
+overrides: {}

@@ -1,42 +1,144 @@
 # configs/models/bakeoff_candidates.yml
 #
-# Base-model bake-off candidate shortlist, per language (tech-spec §3.2, ARD
-# §6). Committed verbatim from the tech-spec's already-verified content
-# (verified 2026-08-31) — unlike the diff-catalog files, this is not a
-# linguist-owned research question; it is a fully decided, dated
-# configuration. Re-verify hf_repo/license before actually training, per the
-# tech-spec's own note, in case a listing or license changes between now and
-# a real bake-off run.
+# Base-model bake-off candidate shortlist, per language (tech-spec v2 §3.2,
+# ADR 0008, ADR 0010). Supersedes the v1 file (schema_version 1.x, ADR 0001,
+# issue #16): both `frc` and `lou` previously listed
+# claire-7b-apache/croissantllm-chat/mistral-7b-v0.3/control-low-transfer.
+# MIG-01c (issue #27) replaces both lists wholesale per the tech-spec's own
+# "supersedes BOTH lists" instruction; `control-low-transfer: base: null` is
+# removed as unimplementable (each arm's own untuned base is now scored via
+# the `control: untuned_base` policy string, not a fourth candidate row).
+#
+# Every hf_repo/license is re-verified before a real bake-off run
+# (`docs/model-license-check_20260903.md`, fetched via the Hugging Face API
+# 2026-09-03); re-verify again per funding phase and before any release
+# (tech-spec v2 §3.2) — a Hugging Face listing never implies a
+# training-compatible license.
+schema_version: "2.0.0"
+
+defaults:
+  instruct: required
+  seeds: 3
+  forgetting_axis: required
+  release_licenses: [apache-2.0, mit]
+  nf4_min_size_b: 20   # NF4 QLoRA rule enforced by the training driver against size_b (tech-spec v2 §5)
+
 frc:
-  candidates:
-    - id: claire-7b-apache
+  control: untuned_base   # each arm's own base, scored first (tech-spec v2 §6.3); optional: same-size English-dominant model
+  arms:
+    - id: A-lucie-7b-instruct
+      hf_repo: "OpenLLM-France/Lucie-7B-Instruct-v1.1"
+      license: apache-2.0
+      size_b: 7
+      note: >
+        Re-fetched 2026-09-03. Apache-2.0, ungated, card modified 2025-03-21.
+    - id: B-ministral-3-8b
+      hf_repo: "mistralai/Ministral-3-8B-Instruct-2512"
+      license: apache-2.0
+      size_b: 8
+      alt: "Mistral-Nemo-Instruct-2407 (12B)"
+      note: >
+        Re-fetched 2026-09-03. Apache-2.0, ungated, card modified 2026-07-15. Alt
+        (Mistral-Nemo-Instruct-2407) also confirmed apache-2.0, ungated.
+    - id: C-salamandra-7b
+      hf_repo: "BSC-LT/salamandra-7b-instruct"
+      license: apache-2.0
+      size_b: 7
+      note: >
+        Re-fetched 2026-09-03. Apache-2.0, ungated, card modified 2025-10-22.
+    - id: D-smollm3-3b
+      hf_repo: "HuggingFaceTB/SmolLM3-3B"
+      license: apache-2.0
+      size_b: 3
+      alt: "croissantllm/CroissantLLMChat-v0.1 (mit)"
+      note: >
+        Re-fetched 2026-09-03. Apache-2.0, ungated, card modified 2025-09-10. Alt
+        (CroissantLLMChat-v0.1) confirmed mit, ungated.
+    - id: F-claire-7b-apache
       hf_repo: "OpenLLM-France/Claire-7B-Apache-0.1"
       license: apache-2.0
+      size_b: 7
+      instruct: false
+      optional: true   # Open Q9 — base checkpoint, not instruct; optional arm
       note: >
-        Verified 2026-08-31. Mistral-7B-v0.1-derived, trained on diarized French conversation
-        (parliamentary proceedings, theater scripts, interviews) — speech-genre-adjacent per
-        ARD §6. CAUTION: sibling repos Claire-7B-0.1 and Claire-Mistral-7B-0.1 exist under
-        CC-BY-NC-SA 4.0 (non-commercial) — pin this exact repo id, never "Claire" generically,
-        or an engineer could silently pull the non-commercial variant. No recent-activity signal
-        found beyond its Nov 2023 publication; confirm still hosted before committing.
-    - id: croissantllm-chat
-      hf_repo: "croissantllm/CroissantLLMChat-v0.1"
+        Re-fetched 2026-09-03. Apache-2.0, ungated, card modified 2023-11-29. base,
+        not instruct (Open Q9). CAUTION: sibling repo OpenLLM-France/Claire-7B-0.1
+        is cc-by-nc-sa-4.0 (confirmed 2026-09-03) — never a release arm; pin this
+        exact repo id.
+  fallbacks: ["Qwen/Qwen3-8B", "utter-project/EuroLLM-9B-Instruct-2512", "swiss-ai/Apertus-8B-Instruct"]
+  # All three re-fetched 2026-09-03: apache-2.0, ungated. EuroLLM's undated id
+  # (no `-2512` suffix) carries an auto-approved gate — the `-2512` successor
+  # above does not; use the successor.
+  stretch: ["mistralai/Mistral-Small-3.2-24B-Instruct-2506", "Qwen/Qwen3-32B", "allenai/Olmo-3-32B-Think"]
+  # QLoRA nf4, 1 seed. Ids corrected 2026-09-03 (docs/model-license-check_20260903.md):
+  # the undated Mistral id and a plain `Olmo-3-32B`/`-Instruct` do not exist on the
+  # Hub; `Olmo-3-32B-Think` (apache-2.0) is the only 32B instruct-family Olmo 3;
+  # kept by owner ruling 2026-09-03, activated only when the run's memory fits it
+  # (NF4 QLoRA on an 80 GB+ GPU; local evaluation inference only if unified memory
+  # holds the checkpoint, ~16-20 GB at 4-bit, ~64 GB at bf16). All three arms
+  # re-fetched 2026-09-03: apache-2.0, ungated.
+
+lou:
+  control: untuned_base
+  generative_arms:
+    # Two arms only (ADR 0010, supersedes ADR 0001's four-arm lou list): no
+    # credible open-weight generative hat-adapted LLM exists to test the
+    # ancestor-transfer hypothesis with (R2 §2.2). hf_repo is filled in at
+    # bake-off time once the frc bake-off has produced a winner — this
+    # config cannot name it in advance.
+    - id: A-french-native
+      hf_repo: "<frc winner>"
+      license: "[VERIFY]"   # inherits the frc winner's license; confirmed once that winner is known
+      note: >
+        The frc bake-off winner's own base (ADR 0010 decision 1), reused here as
+        the French-native generative arm. License is the winning frc arm's own
+        license, confirmed at that point — not independently verifiable before
+        the frc bake-off runs.
+    - id: B-untuned-base
+      hf_repo: "<frc winner>"
+      license: "[VERIFY]"
+      note: >
+        The same model's own untuned base, scored on the same locked probes
+        (tech-spec v2 §3.2 harness responsibility 3) — the second generative arm
+        per ADR 0010 decision 1 ("a French-native base ... versus its own untuned
+        base").
+  mt_arms:
+    # Three arms (ADR 0010 decision 2): chrF primary (BLEU secondary, lou's
+    # orthography is unstable); a contrastive hat/lou minimal-pair probe is
+    # required for every arm here.
+    - id: A-kreyol-mt
+      hf_repo: "jhu-clsp/kreyol-mt"
+      license: mit
+      size_m: 611
+      base: "facebook/mbart-large-50-many-to-many-mmt"
+      lang_token: "<2lou>"
+      note: >
+        Re-fetched 2026-09-03. mit, confirmed via the Hugging Face API. lou
+        training slice is 1,840 pairs against 667,000 hat pairs (362:1), largely
+        pre-1920s orthography (arXiv 2405.05376) — see lou.prerequisite below.
+    - id: B-french-native-adapter
+      hf_repo: "<frc winner>"
+      license: "[VERIFY]"
+      note: >
+        Same winner/license-pending arm as generative_arms.A-french-native
+        (ADR 0010 decision 2) — the French-native LLM adapter compared against
+        the genuinely creole-adapted Kreyòl-MT arm.
+    - id: C-mbart50-no-creole
+      hf_repo: "facebook/mbart-large-50-many-to-many-mmt"
       license: mit
       note: >
-        Verified 2026-08-31. Base variant: croissantllm/CroissantLLMBase. 1.3B params, bilingual
-        FR-EN, built for code-switching per ARD §6 — smaller model class as ARD's caveat flags.
-        Last activity signal ~Oct 2024.
-    - id: mistral-7b-v0.3
-      hf_repo: "mistralai/Mistral-7B-v0.3"
-      license: apache-2.0
-    - id: control-low-transfer
-      base: null
-lou:
-  candidates:
-    - id: mistral-7b-v0.3
-      hf_repo: "mistralai/Mistral-7B-v0.3"
-      license: apache-2.0
-    - id: control-low-transfer
-      base: null
-  # No hat-transfer candidate: no open-weight generative Haitian-Creole-adapted LLM exists
-  # (verified 2026-08-31 — see tech-spec §3.2). 2-candidate bake-off, not a placeholder gap.
+        Mandatory no-creole control (ADR 0010 decision 2) — Lent et al. (2022)'s
+        random-unrelated-language negative-transfer result makes "any
+        multilingual initialization looks like transfer" a real confound to rule
+        out. MIT per the base card facebook/mbart-large-50 (fetched 2026-09-03);
+        the -mmt card itself carries no license tag or LICENSE file — re-fetch at
+        bake-off time per the standing rule (tech-spec v2 §3.2 update
+        2026-09-03).
+  prerequisite: >
+    modern-orthography (KVO 2016) lou eval set; Kreyòl-MT's lou slice is
+    pre-1920s spelling [V: R2] (ADR 0010 decision 4, Open Q15 — not yet a
+    committed deliverable)
+  decision_rule: >
+    within noise -> French-native wins on CARE grounds; within noise = the chrF
+    difference lies inside the 95% paired-bootstrap CI (items resampled, 1,000
+    resamples) on the locked lou eval set (Q13 closed 2026-09-03, ADR 0015)

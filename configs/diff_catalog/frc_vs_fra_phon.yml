@@ -1,0 +1,156 @@
+# configs/diff_catalog/frc_vs_fra_phon.yml — phonetic diff/edge-case catalog
+#
+# ENGINEERING-DRAFTED, LINGUIST-UNREVIEWED SEED — see frc_vs_fra.yml's/
+# lou_vs_fra.yml's header notes for the same caveat. New file, created by
+# MIG-01f (issue #30; backlog 0019) per tech-spec v2 §1's repo layout
+# ("frc_vs_fra_phon (PC-5) — MIG-01f / backlog 0019") and §4's phon-file
+# worked example.
+#
+# Named cells: P1-P13, transcribed from the v4 Nous research note Appendix A
+# (tech-spec v2 §4: "frc_vs_fra_phon.yml (excerpt; P1-P13 from the v4 note
+# Appendix A)"). Only P2 has real content in tech-spec v2's own worked
+# excerpt; every other cell (P1, P3-P13) is an engineering stub only
+# (feature: "[LINGUIST TO STATE]") since the source document does not state
+# their content and this file must not invent phonetic content beyond what
+# tech-spec v2/the v4 note actually say (ADR 0002 placeholder convention;
+# issue #30 "Out of scope": "Real content authorship for the P1, P3-P13
+# phon-file stub cells — a linguist task").
+# `priority: low` on the stub cells is a placeholder meaning "not yet triaged" (the field
+# is required and has no untriaged value); it is not a linguist ranking. P2 keeps the
+# tech-spec's own priority.
+meta:
+  target_lang: frc
+  contrast_lang: fra
+  version: 1.0.0
+  schema_version: "2.0.0"
+  modality: speech
+  status: draft-unreviewed
+  drafted_from: "dev/tech-spec_fine-tune-cajun_v2_fable51max_20260902.md §4 (P2 worked example verbatim); v4 Nous research note Appendix A (P1-P13 cell inventory, content not yet transcribed for P1/P3-P13)"
+cells:
+  - id: P1
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  # P2: the one cell tech-spec v2 §4 gives real worked-example content for,
+  # transcribed verbatim.
+  - id: P2
+    axis: phonology
+    feature: "t, d before i, u as ts/dz or tch/dj"
+    frc_form: "petit → pitsi | pitchi"
+    ortho_visible: false
+    modality: speech
+    lect_scope: [acadiana_west_prairie, acadiana_central]
+    environment:
+      segment: "t d"
+      replacement: "ts dz"
+      following_context: "i y"
+    respelling_attested: true
+    probe_task: [phone_error, g2p, alignment]
+    priority: critical
+    gate_class: null   # no stop rule in 0.1.5 (tech-spec v2 §4)
+    source: "R5 v4 note Appendix A (P1-P13)"
+    coverage_status: unmet
+
+  - id: P3
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P4
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P5
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P6
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P7
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P8
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P9
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P10
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P11
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P12
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"
+
+  - id: P13
+    axis: phonology
+    feature: "[LINGUIST TO STATE]"
+    ortho_visible: false
+    modality: speech
+    priority: low
+    coverage_status: unmet
+    source: "R5 v4 note Appendix A (P1-P13)"

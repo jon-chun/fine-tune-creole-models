@@ -3,7 +3,11 @@
 # ENGINEERING-DRAFTED, LINGUIST-UNREVIEWED SEED — see lou_vs_fra.yml's header
 # note for the same caveat. Transcribed from the ARD §4 Cajun/Louisiana
 # French divergence table; makes no new linguistic claims beyond what that
-# table states.
+# table states. v2 cell fields (gate_class/ortho_visible/modality/
+# lect_scope/probe_task) added by MIG-01f (issue #30, tech-spec v2 §4, D-6)
+# only where tech-spec v2's excerpt gives a value for that specific cell;
+# left null/omitted elsewhere, per the same "no new linguistic claims beyond
+# what the source states" discipline this file's header already commits to.
 #
 # Cajun/Louisiana French retains French inflection and grammatical gender
 # (ARD §4): its risk profile differs from Kouri-Vini's — it is structurally
@@ -15,10 +19,10 @@
 meta:
   target_lang: frc
   contrast_lang: fra
-  version: 0.1.0-draft
-  schema_version: "1.0.0"
+  version: 2.0.0
+  schema_version: "2.0.0"
   status: draft-unreviewed
-  drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4 (source: linguistics-deep-dive.md, kouri-vini-louisiana-french-survey.md)"
+  drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4 (source: linguistics-deep-dive.md, kouri-vini-louisiana-french-survey.md); v2 cell-field/VERB-001 correction from dev/tech-spec_fine-tune-cajun_v2_fable51max_20260902.md §4"
 cells:
   - id: ASP-001
     axis: morphosyntax
@@ -30,15 +34,8 @@ cells:
     source: "linguistics-deep-dive.md"
     coverage_status: unmet
 
-  - id: FUT-001
-    axis: morphosyntax
-    feature: "future register/frequency distribution"
-    frc_form: "aller + infinitive, shared with French but different register/frequency distribution"
-    fra_contrast: "futur simple more common in formal French"
-    failure_mode: "register-flattening loses the vernacular signal"
-    priority: medium
-    source: "linguistics-deep-dive.md"
-    coverage_status: unmet
+  # FUT-001 (frequency only) dropped per tech-spec v2 §4: "FUT-001
+  # (frequency only) is dropped."
 
   - id: PRO-002
     axis: lexicogrammar
@@ -50,14 +47,23 @@ cells:
     source: "linguistics-deep-dive.md"
     coverage_status: unmet
 
+  # VERB-001 corrected per tech-spec v2 §4's worked example verbatim
+  # (present-tense 3pl -ont, not the v1 draft's vaguer -aient contrast).
   - id: VERB-001
     axis: morphosyntax
-    feature: "3rd-person-plural verb endings"
-    frc_form: "dialectal endings distinct from Standard French's -aient"
-    fra_contrast: "standard -aient"
-    failure_mode: "silently regularized to Standard French conjugation"
-    priority: high
-    source: "linguistics-deep-dive.md"
+    feature: "present-tense 3pl -ont"
+    frc_form: "ils mangeont"
+    fra_contrast: "ils mangent"
+    failure_mode: "regularized to Standard French -ent"
+    priority: critical
+    gate_class: 1
+    ortho_visible: true
+    modality: text
+    lect_scope: all
+    probe_task: [normalize, contrast, judge]
+    base_failure_rate: null
+    min_probes: 40
+    source: "R5 v4 A18; Emmitte 2013"
     coverage_status: unmet
 
   - id: PRO-003
@@ -70,6 +76,57 @@ cells:
     source: "linguistics-deep-dive.md"
     coverage_status: unmet
 
+  # PRO-004 (v4 note Appendix A19): ils for elles. tech-spec v2 §4 names
+  # this cell but gives no worked-example fields beyond the id/source
+  # pointer ("PRO-004 ils for elles (A19)") — feature/frc_form/fra_contrast
+  # below are the minimal, literal transcription of that pointer; every
+  # further field is left null/omitted rather than invented.
+  - id: PRO-004
+    axis: lexicogrammar
+    feature: "ils for elles (3rd-person-plural gender neutralization)"
+    frc_form: "ils used for both masculine and feminine 3rd-person-plural reference"
+    fra_contrast: "elles (feminine 3rd-person-plural retained)"
+    failure_mode: null
+    priority: high
+    source: "R5 v4 A19"
+    coverage_status: unmet
+
+  # DET-002 (v4 note Appendix A22): de le/de les for du/des. gate_class 2 is taken from
+  # tech-spec v2 §8's scorecard example ("gate_class": {..., "DET-002": 2}); priority is
+  # engineering-assigned pending linguist review (ADR 0002).
+  - id: DET-002
+    axis: morphosyntax
+    feature: "de le/de les for du/des"
+    frc_form: "de le, de les"
+    fra_contrast: "du, des (contracted partitive/indefinite articles)"
+    failure_mode: null
+    priority: high
+    gate_class: 2
+    source: "R5 v4 A22"
+    coverage_status: unmet
+
+  # AUX-001 (v4 note Appendix A23): avoir pour.
+  - id: AUX-001
+    axis: lexicogrammar
+    feature: "avoir pour"
+    frc_form: "avoir pour + infinitive"
+    fra_contrast: null
+    failure_mode: null
+    priority: medium
+    source: "R5 v4 A23"
+    coverage_status: unmet
+
+  # LEX-001 (v4 note Appendix A24): chevrette, chaoui, asteur, char.
+  - id: LEX-001
+    axis: lexicogrammar
+    feature: "vernacular lexical items (chevrette, chaoui, asteur, char)"
+    frc_form: "chevrette, chaoui, asteur, char"
+    fra_contrast: "crevette, raton laveur, maintenant, voiture"
+    failure_mode: null
+    priority: medium
+    source: "R5 v4 A24"
+    coverage_status: unmet
+
   - id: LOAN-001
     axis: lexicogrammar
     feature: "bare English loanverbs"
@@ -78,4 +135,18 @@ cells:
     failure_mode: "model imposes French inflection onto code-switched English verbs"
     priority: high
     source: "linguistics-deep-dive.md, kouri-vini-louisiana-french-survey.md"
+    coverage_status: unmet
+
+  # CS-001 (code-switching): tech-spec v2 §4 names this cell in the
+  # frc_vs_fra.yml cell list but gives no worked-example fields — engineering
+  # stub only, per ADR 0002's placeholder-seeding convention.
+  - id: CS-001
+    axis: code-switching
+    feature: "code-switching (frc/eng)"
+    frc_form: null
+    fra_contrast: null
+    failure_mode: null
+    priority: medium
+    modality: text
+    source: "dev/tech-spec_fine-tune-cajun_v2_fable51max_20260902.md §4"
     coverage_status: unmet

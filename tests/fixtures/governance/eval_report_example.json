@@ -1,0 +1,11 @@
+{
+  "run_id": "frc-lucie7b-s1", "language": "frc",
+  "release_class": "research_only", "worst_class": 2, "exit_code": 3,
+  "cells": [{"cell_id": "VERB-001", "task": "normalize", "n_locked": 40,
+             "base_rate": 0.82, "tuned_rate": 0.35, "wilson_95": [0.21, 0.52],
+             "mcnemar_p": 0.002, "gate_class": 1, "class_assigned": 2}],
+  "baselines": {"untuned_base": "..."}, "unmet_cells": ["VERB-001"],
+  "forgetting": {"fra_matched_f1_delta": -0.7, "flagged": false},
+  "cost": {"gpu_hours": 1.2, "usd": 4.05, "instance": "H100-80GB"},
+  "adapter_sha256": "...", "manifest_sha256": "..."
+}

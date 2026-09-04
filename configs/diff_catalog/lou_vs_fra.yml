@@ -12,11 +12,19 @@
 # add attestation, adjust `priority`, and add the many additional cells the
 # ARD's table only summarizes (it names 7 axes as "highest-value," not an
 # exhaustive catalog).
+#
+# v2 migration (MIG-01f, issue #30): tech-spec v2 §4's excerpts name no
+# specific cell edit for this file beyond the general new v2 cell fields
+# (gate_class/ortho_visible/modality/lect_scope/probe_task/etc.) — those are
+# left null/omitted on every existing cell below rather than invented, per
+# the "no new linguistic claims beyond what the source states" discipline
+# this file's header already commits to. Only the file-level
+# version/schema_version are bumped.
 meta:
   target_lang: lou
   contrast_lang: fra
-  version: 0.1.0-draft
-  schema_version: "1.0.0"
+  version: 2.0.0
+  schema_version: "2.0.0"
   status: draft-unreviewed
   drafted_from: "dev/ARD_fine-tune-cajun_v1_20260831.md §4 (source: linguistics-deep-dive.md)"
 cells:
